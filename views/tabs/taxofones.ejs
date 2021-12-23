@@ -1,0 +1,63 @@
+<h3>Список таксофоны <a href="#tax-modal" class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a></h3>
+            
+<table class="orders-table">
+  <thead>
+    <tr>
+      <th>Номер телефона</th>
+      <!-- <th>Аттрибуты</th> -->
+      <th>Адрес</th>
+      <th>АТС</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    <template v-if="taxophones.length > 0">
+        <tr v-for="el of taxophones">
+            <td>{{el.phoneNumber }}</td>
+            <td>{{el.addressArea}}, {{el.addressCity}}, {{el.addressStreet}}, {{el.addressHouse}} </td>
+            <td>{{el.ats ? el.ats.name : '-'}}</td>
+            <td>
+                <button @click="() => deleteTax(el._id)" class="btn-floating red white-text waves-effect waves-light">
+                    <i class="material-icons">delete</i>
+                </button>
+            </td>
+        </tr>
+    </template>
+  </tbody>
+</table>
+
+
+<div id="tax-modal"  class="modal">
+    <form autocomplete="off" ref="taxophoneModalRef" class="modal-content">
+      <h4>Добавить таксофон</h4>
+      <p>
+          <div class="row">
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="number" v-model="newTax.phoneNumber" id="taxophones-number" minlength="4" class="validate">
+                <label for="taxophones-number">Номер*</label>
+            </div>
+            <div class="input-field col s8">
+                <input autocomplete="false" required type="text" @change="checkTaxAddress" v-model="newTax.address"  id="taxophones-name" minlength="4" class="validate">
+                <label for="taxophones-name">Адрес*</label>
+                <div class="autocomplete-list collection">
+                    <a href="#!" @click="() => selectTaxAddress(sugg)" v-for="sugg of newTax.suggestions" :key="sugg.value" class="collection-item">{{sugg.unrestricted_value}}</a>
+                </div>
+            </div>
+            <div class="input-field col s6">
+                <select id="taxophone-ats" required class="select" v-model="newTax.ats">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <template v-for="el of ats">
+                        <option :value="el._id">{{el.name}}</option>
+                    </template>
+                </select>
+                <label for="taxophone-ats">АТС*</label>
+            </div>
+             
+          </div>
+        </p>
+    </form>
+    <div class="modal-footer">
+        <a href="#!" @click="clearTax" class="modal-close waves-effect waves-yellow btn">Отмена</a>
+        <a href="#!" @click="createTax" :disabled="$refs.taxophoneModalRef ? !$refs.taxophoneModalRef.checkValidity() : false" class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+    </div>
+  </div>

@@ -1,0 +1,86 @@
+<h3>Список телефонов <a href="#telephone-modal" class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a></h3>
+            
+<table class="orders-table">
+  <thead>
+    <tr>
+      <th>Номер телефона</th>
+      <th>Адрес</th>
+      <th>Тип телефона</th>
+      <th>Абонент</th>
+      <th>Свободный</th>
+      <th>АТС</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    <template v-if="telephones.length > 0">
+        <tr v-for="el of telephones">
+            <td>{{el.phoneNumber }}</td>
+            <td>{{el.addressArea}}, {{el.addressCity}}, {{el.addressStreet}}, {{el.addressHouse}} {{el.addressAppartament ? el.addressAppartament : ''}} </td>
+            <td>{{el.phoneType === 'basic' ? 'Основной' : el.phoneType === 'parrallel' ? 'Параллельный' : 'Спаренный'}}</td>
+            <td>{{el.phoneOwner ? `${el.phoneOwner.firstName} ${el.phoneOwner.lastName}` : '-'}}</td>
+            <td>{{el.isFree ? 'Да' : 'Нет'}}</td>
+            <td>{{el.ats ? el.ats.name : '-'}}</td>
+            <td>
+                <button @click="() => deletePhone(el._id)" class="btn-floating red white-text waves-effect waves-light">
+                    <i class="material-icons">delete</i>
+                </button>
+            </td>
+        </tr>
+    </template>
+  </tbody>
+</table>
+
+
+<div id="telephone-modal"  class="modal">
+    <form autocomplete="off" ref="telephoneModalRef" class="modal-content">
+      <h4>Добавить телефон</h4>
+      <p>
+          <div class="row">
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="number" v-model="newPhone.phoneNumber" id="telephones-number" minlength="4" class="validate">
+                <label for="telephones-number">Номер*</label>
+            </div>
+            <div class="input-field col s8">
+                <input autocomplete="false" required type="text" @change="checkPhoneAddress" v-model="newPhone.address"  id="telephones-adress" minlength="4" class="validate">
+                <label for="telephones-adress">Адрес*</label>
+                <div class="autocomplete-list collection">
+                    <a href="#!" @click="() => selectPhoneAddress(sugg)" v-for="sugg of newPhone.suggestions" :key="sugg.value" class="collection-item">{{sugg.unrestricted_value}}</a>
+                </div>
+            </div>
+            <div class="input-field col s6">
+                <select id="telephone-ats" required class="select" v-model="newPhone.ats">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <template v-for="el of ats">
+                        <option :value="el._id">{{el.name}}</option>
+                    </template>
+                </select>
+                <label for="telephone-ats">АТС*</label>
+            </div>
+            <div class="input-field col s6">
+                <select id="telephone-owner" required class="select" v-model="newPhone.phoneOwner">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <template v-for="el of subscribers">
+                        <option :value="el._id">{{el.firstName}} {{el.lastName}}</option>
+                    </template>
+                </select>
+                <label for="telephone-owner">Абонент*</label>
+            </div>
+            <div class="input-field col s6">
+                <select id="telephone-owner" required class="select" v-model="newPhone.phoneType">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <option value="basic" >Основной</option>
+                    <option value="parrallel">Параллельный </option>
+                    <option value="paired" >Спаренный</option>
+                  
+                </select>
+                <label for="telephone-owner">Тип телефона</label>
+            </div>
+          </div>
+        </p>
+    </form>
+    <div class="modal-footer">
+        <a href="#!" @click="clearPhone" class="modal-close waves-effect waves-yellow btn">Отмена</a>
+        <a href="#!" @click="createPhone" :disabled="$refs.telephoneModalRef ? !$refs.telephoneModalRef.checkValidity() : false" class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+    </div>
+  </div>

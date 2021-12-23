@@ -1,0 +1,67 @@
+<h3>Список операторов <a href="#admins-modal" class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a></h3>
+            
+<table class="orders-table">
+  <thead>
+    <tr>
+      <th>Имя</th>
+      <!-- <th>Аттрибуты</th> -->
+      <th>Пароль</th>
+      <th>Почта</th>
+      <th>АТС</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    <template v-if="admins.length > 0">
+        <tr v-for="el of admins">
+            <td>{{el.name }}</td>
+            <td style="max-width: 300px; text-overflow: ellipsis; overflow:hidden;">{{el.password }}</td>
+            <td>{{el.email || ''}}</td>
+            <td>{{el.ats ? el.ats.name : '-'}}</td>
+            <td>
+                <button @click="() => deleteAdmin(el._id)" class="btn-floating red white-text waves-effect waves-light">
+                    <i class="material-icons">delete</i>
+                </button>
+            </td>
+        </tr>
+    </template>
+  </tbody>
+</table>
+
+
+<div id="admins-modal"  class="modal">
+    <form autocomplete="off" ref="adminModalRef" class="modal-content">
+      <h4>Добавить оператора</h4>
+      <p>
+          <div class="row">
+            <div class="input-field col s6">
+                <input autocomplete="off" required type="email" v-model="newAdmin.email" id="admins-email" minlength="4" class="validate">
+                <label for="admins-email">Email*</label>
+            </div>
+            <div class="input-field col s6">
+                <input autocomplete="false" required type="text" v-model="newAdmin.name"  id="admins-name" minlength="4" class="validate">
+                <label for="admins-name">Имя*</label>
+            </div>
+            <div class="input-field col s6">
+                <input autocomplete="false" required type="password" v-model="newAdmin.password" id="admins-password" minlength="4" class="validate">
+                <label for="admins-password">Пароль*</label>
+            </div>
+            
+            <div class="input-field col s6">
+                <select id="admin-ats" required class="select" v-model="newAdmin.ats">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <template v-for="el of ats">
+                        <option :value="el._id">{{el.name}}</option>
+                    </template>
+                </select>
+                <label for="admin-ats">АТС*</label>
+            </div>
+             
+          </div>
+        </p>
+    </form>
+    <div class="modal-footer">
+        <a href="#!" @click="clearAdmin" class="modal-close waves-effect waves-yellow btn">Отмена</a>
+        <a href="#!" @click="createAdmin" :disabled="$refs.adminModalRef ? !$refs.adminModalRef.checkValidity() : false" class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+    </div>
+  </div>

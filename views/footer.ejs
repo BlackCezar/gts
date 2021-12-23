@@ -1,0 +1,18 @@
+<script>
+    M.AutoInit();
+    let datepickers = document.querySelectorAll('.datepicker');
+    if (datepickers) {
+      M.Datepicker.init(datepickers, {
+        minDate: new Date(Date.now())
+      })
+    }
+    let timepicker = document.querySelectorAll('.timepicker');
+    if (timepicker) {
+      M.Timepicker.init(timepicker, {
+        twelveHour: false
+      })
+    }
+  </script>
+</body>
+
+</html>

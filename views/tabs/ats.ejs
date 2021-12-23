@@ -1,0 +1,76 @@
+<h3>Список АТС <a href="#ats-modal" class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a></h3>
+            
+<table class="orders-table">
+  <thead>
+    <tr>
+      <th>Имя</th>
+      <th>Тип</th>
+      <!-- <th>Аттрибуты</th> -->
+      <th>Адресс</th>
+      <th>Кол-во телефонов</th>
+      <th>Создатель</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    <template v-if="ats.length > 0">
+        <tr v-for="el of ats">
+            <td>{{el.name || '-'}}</td>
+            <td>{{el.atsType === 'city' ? 'Городская' : el.atsType === 'departmental' ? 'Ведомственная' : 'Учрежденческая' }}</td>
+            <td>{{el.addressArea}}, {{el.addressCity}}, {{el.addressStreet}}, {{el.addressHouse}} </td>
+            <td>{{el.numbers || 0}}</td>
+            <td>{{el.author ? el.author.name ? el.author.name : '-' : '-'}}</td>
+            <td>
+                <button @click="() => deleteATS(el._id)" class="btn-floating red white-text waves-effect waves-light">
+                    <i class="material-icons">delete</i>
+                </button>
+            </td>
+        </tr>
+    </template>
+  </tbody>
+</table>
+
+
+<div id="ats-modal" class="modal">
+    <div class="modal-content">
+      <h4>Добавить АТС</h4>
+      <p>
+          <div class="row">
+            <div class="input-field col s4">
+                <select v-model="newATS.atsType">
+                  <option value="" disabled selected>Choose your option</option>
+                  <option value="city">Городская</option>
+                  <option value="departmental">Ведомственная </option>
+                  <option value="institutional">Учрежденческая </option>
+                </select>
+                <label>Тип АТС</label>
+              </div>
+              
+              <div class="input-field col s4">
+                <input type="text" v-model="newATS.name" id="ats-name" minlength="4" class="validate">
+                <label for="ats-name">Имя</label>
+            </div>
+              <div class="input-field col s4">
+                <input type="text" v-model="newATS.address" @change="checkAddress" id="ats-street" minlength="4" class="validate">
+                <label for="ats-street">Адрес</label>
+                <div class="autocomplete-list collection">
+                    <a href="#!" @click="() => selectATSAddress(sugg)" v-for="sugg of newATS.suggestions" :key="sugg.value" class="collection-item">{{sugg.unrestricted_value}}</a>
+                </div>
+              </div>
+          </div>
+          <div class="row" v-if="newATS.selectedSugg.region">
+              <div class="col s4">
+                  <div class="span">Индекс: <b>{{newATS.selectedSugg.postal_code}}</b></div>
+                  <div class="span">Регион: <b>{{newATS.selectedSugg.region_with_type}}</b></div>
+                  <div class="span">Город: <b>{{newATS.selectedSugg.city_with_type}}</b></div>
+                  <div class="span">Улица: <b>{{newATS.selectedSugg.street_with_type}}</b></div>
+                  <div class="span">Дом: <b>{{newATS.selectedSugg.house || ''}}</b></div>
+              </div>
+          </div>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" @click="clearATS" class="modal-close waves-effect waves-yellow btn">Отмена</a>
+        <a href="#!" @click="createATS" :disabled="!newATS.selectedSugg.house || newATS.loading" class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+    </div>
+  </div>

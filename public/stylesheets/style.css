@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+}
+.brand-logo {
+  margin-left: 15px;
+}
+
+.rotate {
+  animation: rotate 1s ease-in-out  infinite;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg)
+  } to {
+    transform: rotate(360deg)
+  }
+}
+
+.tabs .tab a {
+  color: #0d47a16b;
+}
+.tabs .tab a:hover, .tabs .tab a.active {
+  color: #0d47a1;
+}
+.tabs .indicator {
+  background-color: #0d47a1;
+}
+.col > h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.autocomplete-list {
+  position: absolute;
+  margin-top: 0;
+  z-index: 1005;
+  width: calc(100% - 1.5rem);
+}
+.modal {
+  width: 80%;
+  overflow-y: visible;
+}

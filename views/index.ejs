@@ -1,0 +1,58 @@
+<%- include('header'); -%>
+<main id="app">
+  <div class="container">
+    <div class="card ">
+      <div class="card-content">
+        <% if (auth) { %>
+
+        <div class="row">
+          <div class="col s12">
+            <ul class="tabs">
+              <% if (auth.admin) { %>
+                <li class="tab col"><a  href="#test1">АТС</a></li>
+                <li :class="ats.length > 0 ? 'tab col' : 'tab col disabled '"><a href="#test6">Операторы</a></li>
+              <% } else { %>
+                <li class="tab col"><a href="#test2">Абоненты</a></li>
+                <li class="tab col"><a href="#test3">Телефоны</a></li>
+                <li class="tab col"><a class="active" href="#test5">Таксофоны</a></li>
+              <% }%>
+
+            </ul>
+          </div>
+          <% if (auth.admin) { %>
+            <div id="test1" class="col s12">
+              <%- include('tabs/ats'); -%>
+            </div>
+            <div id="test6" class="col s12">
+              <%- include('tabs/admins'); -%>
+            </div>
+          <% } else { %>
+            <div id="test2" class="col s12">
+              <%- include('tabs/subscribers'); -%>
+            </div>
+            <div id="test3" class="col s12">
+              <%- include('tabs/telephones'); -%>
+            </div>
+            <div id="test5" class="col s12">
+              <%- include('tabs/taxofones'); -%>
+            </div>
+            </div>
+          <% }%>
+
+          
+          
+          
+        </div>
+        <% } %>
+
+
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/javascripts/index.js"></script>
+
+
+<%- include('footer'); -%>

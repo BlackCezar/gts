@@ -1,0 +1,88 @@
+<h3>Список абонентов <a href="#subscriber-modal" class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a></h3>
+            
+<table class="orders-table">
+  <thead>
+    <tr>
+      <th>ФИО</th>
+      <th>Пол</th>
+      <th>Возраст</th>
+      <th>Льготы</th>
+      <th>Межгород</th>
+      <th>Баланс</th>
+      <th>Статус</th>
+      <th>Действие</th>
+    </tr>
+  </thead>
+  <tbody>
+    <template v-if="subscribers.length > 0">
+        <tr v-for="el of subscribers">
+            <td>{{el.lastName }} {{el.firstName }} {{el.middleName }}</td>
+            <td>{{el.gander}}</td>
+            <td>{{el.age}}</td>
+            <td>{{el.isBenefits}}</td>
+            <td>{{el.intercityAccess}}</td>
+            <td>{{el.balance}}</td>
+            <td>{{el.status}}</td>
+            <td>
+                <button @click="() => deletePhone(el._id)" class="btn-floating red white-text waves-effect waves-light">
+                    <i class="material-icons">delete</i>
+                </button>
+            </td>
+        </tr>
+    </template>
+  </tbody>
+</table>
+
+
+<div id="subscriber-modal"  class="modal">
+    <form autocomplete="off" ref="subscriberModalRef" class="modal-content">
+      <h4>Добавить абонента</h4>
+      <p>
+          <div class="row">
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="number" v-model="newSubscriber.phoneNumber" id="subscribers-number" minlength="4" class="validate">
+                <label for="subscribers-number">Номер*</label>
+            </div>
+            <div class="input-field col s8">
+                <input autocomplete="false" required type="text" @change="checkPhoneAddress" v-model="newSubscriber.address"  id="subscribers-adress" minlength="4" class="validate">
+                <label for="subscribers-adress">Адрес*</label>
+                <div class="autocomplete-list collection">
+                    <a href="#!" @click="() => selectPhoneAddress(sugg)" v-for="sugg of newSubscriber.suggestions" :key="sugg.value" class="collection-item">{{sugg.unrestricted_value}}</a>
+                </div>
+            </div>
+            <div class="input-field col s6">
+                <select id="subscriber-ats" required class="select" v-model="newSubscriber.ats">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <template v-for="el of ats">
+                        <option :value="el._id">{{el.name}}</option>
+                    </template>
+                </select>
+                <label for="subscriber-ats">АТС*</label>
+            </div>
+            <div class="input-field col s6">
+                <select id="subscriber-owner" required class="select" v-model="newSubscriber.phoneOwner">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <template v-for="el of subscribers">
+                        <option :value="el._id">{{el.firstName}} {{el.lastName}}</option>
+                    </template>
+                </select>
+                <label for="subscriber-owner">Абонент*</label>
+            </div>
+            <div class="input-field col s6">
+                <select id="subscriber-owner" required class="select" v-model="newSubscriber.phoneType">
+                    <option value="" disabled selected>Выбери из списка</option>
+                    <option value="basic" >Основной</option>
+                    <option value="parrallel">Параллельный </option>
+                    <option value="paired" >Спаренный</option>
+                  
+                </select>
+                <label for="subscriber-owner">Тип телефона</label>
+            </div>
+          </div>
+        </p>
+    </form>
+    <div class="modal-footer">
+        <a href="#!" @click="clearPhone" class="modal-close waves-effect waves-yellow btn">Отмена</a>
+        <a href="#!" @click="createPhone" :disabled="$refs.subscriberModalRef ? !$refs.subscriberModalRef.checkValidity() : false" class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+    </div>
+  </div>
