@@ -1,6 +1,7 @@
 var express = require('express');
-const { Telephones, ATS, Admins } = require('../db');
+const { Telephones, ATS, Subscribers } = require('../db');
 var router = express.Router();
+const ObjectID = require('mongoose').Types.ObjectId
 
 
 router.post('/', async function(req, res, next) {
@@ -10,7 +11,8 @@ router.post('/', async function(req, res, next) {
     })
     tax = await tax.save()
     tax.ats = await ATS.findById(req.body.ats)
-    if (tax.phoneOwner) tax.phoneOwner = await Admins.findById(req.body.phoneOwner)
+    console.log(req.body.phoneOwner)
+    if (req.body.phoneOwner) tax.phoneOwner = await Subscribers.findById(req.body.phoneOwner)
  
     if (tax) {
       res.json(tax)
@@ -21,12 +23,29 @@ router.post('/', async function(req, res, next) {
   }
 });
 
+router.put('/:id', async function(req, res, next) {
+  try {
+    console.log('update id ' + ObjectID(req.params.id))
+    let result = await Telephones.updateOne({_id: ObjectID(req.params.id)}, {
+      $set: {
+        ...req.body
+      }
+    })
+
+    if (result) {
+      res.json(result)
+    } else res.sendStatus(403)
+  } catch (err) {
+    console.error(err)
+    res.sendStatus(500)
+  }
+});
 
 router.get('/', async (req, res) => {
   try {
     let telephones = await Telephones.find({
       isPublic: req.query.public === 'true' ? true : false
-    }).populate('ats')
+    }).populate('ats').populate('phoneOwner')
     res.json(telephones)
   } catch(err) {
     console.error(err)

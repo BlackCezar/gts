@@ -1,88 +1,133 @@
-<h3>Список абонентов <a href="#subscriber-modal" class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a></h3>
-            
+<h3>Список абонентов <a href="#subscriber-modal"
+        class="btn-floating blue darken-4 waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a>
+</h3>
+
 <table class="orders-table">
-  <thead>
-    <tr>
-      <th>ФИО</th>
-      <th>Пол</th>
-      <th>Возраст</th>
-      <th>Льготы</th>
-      <th>Межгород</th>
-      <th>Баланс</th>
-      <th>Статус</th>
-      <th>Действие</th>
-    </tr>
-  </thead>
-  <tbody>
-    <template v-if="subscribers.length > 0">
-        <tr v-for="el of subscribers">
-            <td>{{el.lastName }} {{el.firstName }} {{el.middleName }}</td>
-            <td>{{el.gander}}</td>
-            <td>{{el.age}}</td>
-            <td>{{el.isBenefits}}</td>
-            <td>{{el.intercityAccess}}</td>
-            <td>{{el.balance}}</td>
-            <td>{{el.status}}</td>
-            <td>
-                <button @click="() => deletePhone(el._id)" class="btn-floating red white-text waves-effect waves-light">
-                    <i class="material-icons">delete</i>
-                </button>
-            </td>
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Пол</th>
+            <th>Возраст</th>
+            <th>Льготы</th>
+            <th>Межгород</th>
+            <th>Баланс</th>
+            <th>Статус</th>
+            <th>Подключенные телефоны</th>
+            <th>Действие</th>
         </tr>
-    </template>
-  </tbody>
+    </thead>
+    <tbody>
+        <template v-if="subscribers.length > 0">
+            <tr v-for="el of subscribers">
+                <td>{{el.lastName }} {{el.firstName }} {{el.middleName }}</td>
+                <td>{{el.gander ? 'Женский' : 'Мужской'}}</td>
+                <td>{{el.age}}</td>
+                <td>
+                    <template v-if="el.isBenefits"><i class="material-icons">done</i></template>
+                    <template v-else><i class="material-icons">cancel</i></template>
+                </td>
+                <td>
+                    <template v-if="el.intercityAccess"><i class="material-icons">done</i></template>
+                    <template v-else><i class="material-icons">cancel</i></template>
+                </td>
+                <td>{{el.balance}}руб.</td>
+                <td>
+                    <template v-if="el.status === 'active'">Активный</template>
+                    <template v-if="el.status === 'blocked'">Заблокированный</template>
+                    <template v-if="el.status === 'disabled'">Отключен</template>
+                </td>
+                <td>
+                    <template v-for="tel of telephones.filter(t => t.phoneOwner && t.phoneOwner._id === el._id)" >
+                        <a @click="() => editPhone(tel)" href="#">{{tel.phoneNumber}}</a><br>
+                    </template>
+                </td>
+                <td>
+                    <button @click="() => editSubscriber(el)"
+                        class="btn-floating blue darken-4 white-text waves-effect waves-light">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button @click="() => deleteSubscriber(el._id)"
+                        class="btn-floating red white-text waves-effect waves-light">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </td>
+            </tr>
+        </template>
+    </tbody>
 </table>
 
 
-<div id="subscriber-modal"  class="modal">
+<div id="subscriber-modal" class="modal">
     <form autocomplete="off" ref="subscriberModalRef" class="modal-content">
-      <h4>Добавить абонента</h4>
-      <p>
-          <div class="row">
+        <h4>Добавить абонента</h4>
+        <p>
+        <div class="row">
             <div class="input-field col s4">
-                <input autocomplete="off" required type="number" v-model="newSubscriber.phoneNumber" id="subscribers-number" minlength="4" class="validate">
-                <label for="subscribers-number">Номер*</label>
+                <input autocomplete="off" required type="text" v-model="newSubscriber.firstName"
+                    id="subscribers-firstName" minlength="4" class="validate">
+                <label :class="newSubscriber.firstName ? 'active' : ''" for="subscribers-firstName">Имя*</label>
             </div>
-            <div class="input-field col s8">
-                <input autocomplete="false" required type="text" @change="checkPhoneAddress" v-model="newSubscriber.address"  id="subscribers-adress" minlength="4" class="validate">
-                <label for="subscribers-adress">Адрес*</label>
-                <div class="autocomplete-list collection">
-                    <a href="#!" @click="() => selectPhoneAddress(sugg)" v-for="sugg of newSubscriber.suggestions" :key="sugg.value" class="collection-item">{{sugg.unrestricted_value}}</a>
-                </div>
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="text" v-model="newSubscriber.lastName"
+                    id="subscribers-lastName" minlength="4" class="validate">
+                <label :class="newSubscriber.lastName ? 'active' : ''" for="subscribers-lastName">Фамилия*</label>
             </div>
-            <div class="input-field col s6">
-                <select id="subscriber-ats" required class="select" v-model="newSubscriber.ats">
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="text" v-model="newSubscriber.middleName"
+                    id="subscribers-middleName" minlength="4" class="validate">
+                <label :class="newSubscriber.middleName ? 'active' : ''" for="subscribers-middleName">Отчество*</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="number" v-model="newSubscriber.age" id="subscribers-age"
+                    min="18" max="120" class="validate">
+                <label for="subscribers-age">Возраст*</label>
+            </div>
+            <div class="input-field col s4">
+                <input autocomplete="off" required type="number" v-model="newSubscriber.balance"
+                    id="subscribers-balance" min="0" class="validate">
+                <label for="subscribers-balance">Баланс*</label>
+            </div>
+            <div v-if="newSubscriber._id" class="input-field col s4">
+                <select id="subscribers-status" required class="select" v-model="newSubscriber.status">
                     <option value="" disabled selected>Выбери из списка</option>
-                    <template v-for="el of ats">
-                        <option :value="el._id">{{el.name}}</option>
-                    </template>
+                    <option value="active">Активный</option>
+                    <option value="blocked">Заблокированный</option>
+                    <option value="disabled">Отключен</option>
                 </select>
-                <label for="subscriber-ats">АТС*</label>
+                <label for="subscribers-status">Статус</label>
             </div>
-            <div class="input-field col s6">
-                <select id="subscriber-owner" required class="select" v-model="newSubscriber.phoneOwner">
-                    <option value="" disabled selected>Выбери из списка</option>
-                    <template v-for="el of subscribers">
-                        <option :value="el._id">{{el.firstName}} {{el.lastName}}</option>
-                    </template>
-                </select>
-                <label for="subscriber-owner">Абонент*</label>
+            <div class="switch">
+                <label>
+                    Мужской
+                    <input v-model="newSubscriber.gander" type="checkbox">
+                    <span class="lever"></span>
+                    Женский
+                </label>
             </div>
-            <div class="input-field col s6">
-                <select id="subscriber-owner" required class="select" v-model="newSubscriber.phoneType">
-                    <option value="" disabled selected>Выбери из списка</option>
-                    <option value="basic" >Основной</option>
-                    <option value="parrallel">Параллельный </option>
-                    <option value="paired" >Спаренный</option>
-                  
-                </select>
-                <label for="subscriber-owner">Тип телефона</label>
-            </div>
-          </div>
+
+            <p>
+                <label>
+                    <input id="indeterminate-checkbox" v-model="newSubscriber.isBenefits" type="checkbox" />
+                    <span>Льготны</span>
+                </label>
+            </p>
+            <p>
+                <label>
+                    <input id="indeterminate-checkbox" v-model="newSubscriber.intercityAccess" type="checkbox" />
+                    <span>Межгород</span>
+                </label>
+            </p>
+        </div>
         </p>
     </form>
     <div class="modal-footer">
-        <a href="#!" @click="clearPhone" class="modal-close waves-effect waves-yellow btn">Отмена</a>
-        <a href="#!" @click="createPhone" :disabled="$refs.subscriberModalRef ? !$refs.subscriberModalRef.checkValidity() : false" class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+        <a href="#!" @click="clearSubscriber" class="modal-close waves-effect waves-yellow btn">Отмена</a>
+        <a v-if="!newSubscriber._id" href="#!" @click="createSubscriber"
+            :disabled="$refs.subscriberModalRef ? !$refs.subscriberModalRef.checkValidity() : false"
+            class="waves-effect waves-green blue darken-4 btn">Добавить</a>
+        <a v-else href="#!" @click="saveSubscriber"
+            class="waves-effect waves-green blue darken-4 btn">Сохранить</a>
     </div>
-  </div>
+</div>

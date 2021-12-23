@@ -37,7 +37,7 @@
                 <label for="taxophones-number">Номер*</label>
             </div>
             <div class="input-field col s8">
-                <input autocomplete="false" required type="text" @change="checkTaxAddress" v-model="newTax.address"  id="taxophones-name" minlength="4" class="validate">
+                <input autocomplete="false" required type="text" @input="checkTaxAddress" v-model="newTax.address"  id="taxophones-name" minlength="4" class="validate">
                 <label for="taxophones-name">Адрес*</label>
                 <div class="autocomplete-list collection">
                     <a href="#!" @click="() => selectTaxAddress(sugg)" v-for="sugg of newTax.suggestions" :key="sugg.value" class="collection-item">{{sugg.unrestricted_value}}</a>

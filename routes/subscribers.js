@@ -1,28 +1,18 @@
 var express = require('express');
-const { Sessions, Films, Halls } = require('../db');
+const { Subscribers } = require('../db');
 var router = express.Router();
-
+const ObjectID = require('mongoose').Types.ObjectId
 
 router.post('/', async function(req, res, next) {
   try {
-    if (!req.body.sessionFilm) throw {
-      error: 403,
-      message: 'no_film'
-    } 
-
-    let session = new Sessions({
-      film: req.body.sessionFilm,
-      hall: req.body.sessionHall,
-      time: req.body.sessionTime,
-      date: req.body.sessionDate,
-      price: Number(req.body.sessionPrice)
+    console.log(req.body)
+    let subscriber = new Subscribers({
+      ...req.body
     })
-    session = await session.save()
-    session.film = await Films.findOne({_id: session.film})
-    session.hall = await Halls.findOne({_id: session.hall})
+    subscriber = await subscriber.save()
 
-    if (session) {
-      res.json(session)
+    if (subscriber) {
+      res.json(subscriber)
     } else res.sendStatus(403)
   } catch (err) {
     console.error(err)
@@ -30,6 +20,34 @@ router.post('/', async function(req, res, next) {
   }
 });
 
+router.put('/:id', async function(req, res, next) {
+  try {
+    console.log('update id ' + ObjectID(req.params.id))
+    let result = await Subscribers.updateOne({_id: ObjectID(req.params.id)}, {
+      $set: {
+        ...req.body
+      }
+    })
+
+    if (result) {
+      res.json(result)
+    } else res.sendStatus(403)
+  } catch (err) {
+    console.error(err)
+    res.sendStatus(500)
+  }
+});
+
+router.get('/', async (req, res) => {
+  try {
+    let subscribers = await Subscribers.find()
+    res.json(subscribers)
+  } catch(err) {
+    console.error(err)
+    res.sendStatus(500)
+    res.statusMessage = err.message
+  }
+})
 
 router.delete('/:id', async function(req, res, next) {
   try {
@@ -38,10 +56,10 @@ router.delete('/:id', async function(req, res, next) {
       message: 'no_id'
     } 
 
-    let user = await Sessions.deleteOne({ _id: req.params.id })
+    let deleteStatus = await Subscribers.deleteOne({ _id: req.params.id })
 
-    if (user) {
-      res.json(user)
+    if (deleteStatus) {
+      res.json(deleteStatus)
     } else res.sendStatus(403)
   } catch (err) {
     console.error(err)
